@@ -1,0 +1,290 @@
+{
+  "datasets": [
+    {
+      "name": "620b0464",
+      "displayName": "retention_matrix",
+      "queryLines": [
+        "SELECT\r\n",
+        "  date_format(cohort_month, 'yyyy-MM') AS cohort_month,\r\n",
+        "  ROUND(MAX(M1)  * 100, 1) AS M1_pct,\r\n",
+        "  ROUND(MAX(M3)  * 100, 1) AS M3_pct,\r\n",
+        "  ROUND(MAX(M6)  * 100, 1) AS M6_pct,\r\n",
+        "  ROUND(MAX(M12) * 100, 1) AS M12_pct\r\n",
+        "FROM WORKSPACE.analytics.retention_kpis\r\n",
+        "GROUP BY date_format(cohort_month, 'yyyy-MM')\r\n",
+        "ORDER BY cohort_month;"
+      ]
+    },
+    {
+      "name": "970a3210",
+      "displayName": "Monthly Cohort Retention Trends",
+      "queryLines": [
+        "SELECT\r\n",
+        "  cohort_month,\r\n",
+        "  months_since_cohort,\r\n",
+        "  retention_rate\r\n",
+        "FROM WORKSPACE.analytics.retention_long\r\n",
+        "WHERE months_since_cohort BETWEEN 0 AND 12\r\n",
+        "ORDER BY cohort_month, months_since_cohort;"
+      ]
+    },
+    {
+      "name": "e0f60fc5",
+      "displayName": "Retention-Heatmap",
+      "queryLines": [
+        "SELECT\r\n",
+        "  cohort_month,\r\n",
+        "  months_since_cohort,\r\n",
+        "  retention_rate\r\n",
+        "FROM WORKSPACE.analytics.retention_long\r\n",
+        "WHERE months_since_cohort BETWEEN 0 AND 12\r\n",
+        "ORDER BY cohort_month, months_since_cohort;"
+      ]
+    },
+    {
+      "name": "196bcf5b",
+      "displayName": "Monthly Cohort Retention Percentages Data",
+      "queryLines": [
+        "WITH kpi_tile AS (\r\n",
+        "  SELECT\r\n",
+        "    date_format(cohort_month, 'yyyy-MM') AS cohort_month,\r\n",
+        "    ROUND(MAX(M1)  * 100, 1) AS M1_pct,\r\n",
+        "    ROUND(MAX(M3)  * 100, 1) AS M3_pct,\r\n",
+        "    ROUND(MAX(M6)  * 100, 1) AS M6_pct,\r\n",
+        "    ROUND(MAX(M12) * 100, 1) AS M12_pct\r\n",
+        "  FROM WORKSPACE.analytics.retention_kpis\r\n",
+        "  GROUP BY date_format(cohort_month, 'yyyy-MM')\r\n",
+        "),\r\n",
+        "calc AS (\r\n",
+        "  SELECT\r\n",
+        "    date_format(cohort_month, 'yyyy-MM') AS cohort_month,\r\n",
+        "    ROUND(100 * MAX(CASE WHEN months_since_cohort = 1  THEN retention_rate END), 1) AS M1_pct,\r\n",
+        "    ROUND(100 * MAX(CASE WHEN months_since_cohort = 3  THEN retention_rate END), 1) AS M3_pct,\r\n",
+        "    ROUND(100 * MAX(CASE WHEN months_since_cohort = 6  THEN retention_rate END), 1) AS M6_pct,\r\n",
+        "    ROUND(100 * MAX(CASE WHEN months_since_cohort = 12 THEN retention_rate END), 1) AS M12_pct\r\n",
+        "  FROM WORKSPACE.analytics.retention_long\r\n",
+        "  GROUP BY date_format(cohort_month, 'yyyy-MM')\r\n",
+        ")\r\n",
+        "SELECT\r\n",
+        "  COALESCE(t.cohort_month, c.cohort_month) AS cohort_month,\r\n",
+        "  t.M1_pct  AS tile_M1,  c.M1_pct  AS calc_M1,\r\n",
+        "  t.M3_pct  AS tile_M3,  c.M3_pct  AS calc_M3,\r\n",
+        "  t.M6_pct  AS tile_M6,  c.M6_pct  AS calc_M6,\r\n",
+        "  t.M12_pct AS tile_M12, c.M12_pct AS calc_M12,\r\n",
+        "  CASE\r\n",
+        "    WHEN t.M1_pct  <=> c.M1_pct\r\n",
+        "     AND t.M3_pct  <=> c.M3_pct\r\n",
+        "     AND t.M6_pct  <=> c.M6_pct\r\n",
+        "     AND (t.M12_pct <=> c.M12_pct OR (t.M12_pct IS NULL AND c.M12_pct IS NULL))\r\n",
+        "    THEN 'OK' ELSE 'MISMATCH'\r\n",
+        "  END AS status\r\n",
+        "FROM kpi_tile t\r\n",
+        "FULL OUTER JOIN calc c\r\n",
+        "  ON t.cohort_month = c.cohort_month\r\n",
+        "ORDER BY cohort_month;"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "f9a0c9fe",
+      "displayName": "Global Filters",
+      "layout": [
+        {
+          "widget": {
+            "name": "ee1cb4e5",
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {},
+              "frame": {
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS"
+    },
+    {
+      "name": "4a24017a",
+      "displayName": "Visualization",
+      "layout": [
+        {
+          "widget": {
+            "name": "retention-heat-map",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "970a3210",
+                  "fields": [
+                    {
+                      "name": "sum(retention_rate)",
+                      "expression": "SUM(`retention_rate`)"
+                    },
+                    {
+                      "name": "months_since_cohort",
+                      "expression": "`months_since_cohort`"
+                    },
+                    {
+                      "name": "monthly(cohort_month)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `cohort_month`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "                           Retention Heat Map"
+              },
+              "widgetType": "heatmap",
+              "encodings": {
+                "x": {
+                  "fieldName": "months_since_cohort",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "monthly(cohort_month)",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "color": {
+                  "fieldName": "sum(retention_rate)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "retention-line-chart",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "970a3210",
+                  "fields": [
+                    {
+                      "name": "monthly(cohort_month)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `cohort_month`)"
+                    },
+                    {
+                      "name": "months_since_cohort",
+                      "expression": "`months_since_cohort`"
+                    },
+                    {
+                      "name": "approx_percentile(retention_rate, percentage=0_5)",
+                      "expression": "APPROX_PERCENTILE(`retention_rate`, 0.5)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "                              Retention Line Chart"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "months_since_cohort",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "approx_percentile(retention_rate, percentage=0_5)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "monthly(cohort_month)",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "afc4d9a1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "970a3210",
+                  "fields": [
+                    {
+                      "name": "cohort_month",
+                      "expression": "`cohort_month`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "cohort_month"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
