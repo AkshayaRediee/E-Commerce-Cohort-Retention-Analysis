@@ -84,6 +84,35 @@ It mirrors real-world product and data analytics workflows used in e-commerce an
 | After Month 12 | 91% |
 
 ---
+## Key Business Metrics
+
+(Replace with your real calculated numbers after running project)
+
+Total Customers: 12,540
+
+Overall Retention (Month 1): 42%
+
+Month 3 Retention: 27%
+
+Month 6 Retention: 15%
+
+Average Customer Lifetime (observed window): 4.2 months
+
+Best Performing Cohort: January 2022 (M1 = 48%)
+
+Worst Performing Cohort: September 2022 (M1 = 31%)
+
+### 📈 Retention Insights
+
+Retention drops 58% from Month 0 to Month 1
+
+Significant churn happens in first 30 days
+
+Customers acquired during holiday season show stronger 3-month retention
+
+Later cohorts show improving retention → marketing quality improved
+
+--- 
 
 ## 💰 Revenue Insights
 
