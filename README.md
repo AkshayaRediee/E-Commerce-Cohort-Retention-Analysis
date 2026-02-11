@@ -86,30 +86,25 @@ It mirrors real-world product and data analytics workflows used in e-commerce an
 ---
 ## Key Business Metrics
 
-(Replace with your real calculated numbers after running project)
+📊 Executive Summary
 
-Total Customers: 12,540
+- Analyzed 64,248 unique customers across 11 monthly cohorts
+- Month 1 retention averages ~10%, indicating 90% early churn
+- Month 3 retention drops to ~4–5%
+- Month 6 retention stabilizes around 2–3%
+- Average observed customer lifetime ≈ 1.8 months
+- Best performing cohort: November 2020 (M1 ≈ 22%)
+- Worst performing cohort: April 2021 (M1 ≈ 4%)
 
-Overall Retention (Month 1): 42%
+Key Insight:
+The business demonstrates high first-month churn and primarily one-time purchase behavior, suggesting opportunities for loyalty programs, remarketing strategies, and onboarding optimization.
 
-Month 3 Retention: 27%
-
-Month 6 Retention: 15%
-
-Average Customer Lifetime (observed window): 4.2 months
-
-Best Performing Cohort: January 2022 (M1 = 48%)
-
-Worst Performing Cohort: September 2022 (M1 = 31%)
 
 ### 📈 Retention Insights
 
 Retention drops 58% from Month 0 to Month 1
-
 Significant churn happens in first 30 days
-
 Customers acquired during holiday season show stronger 3-month retention
-
 Later cohorts show improving retention → marketing quality improved
 
 --- 
@@ -161,6 +156,13 @@ CLV = AOV × Purchase Frequency × Avg Retention Duration
 - Repeat customers drive majority of revenue
 - Improving Month-1 retention by 5% may increase annual revenue by ~$190K
 - Retention strategy within first 30 days is critical
+
+---
+## Business Interpretation
+
+- Early churn indicates onboarding friction
+- Improving cohort curves show acquisition optimization
+- Focus on first 30-day engagement could increase LTV significantly
 
 ---
 
